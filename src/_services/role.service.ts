@@ -36,14 +36,6 @@ export class RoleService {
     return this.http.delete(`${API_URL}/deleteRole/${id}`, httpOptions);
   }
 
-  getAllUsers(): Observable<any> {
-    return this.http.get(`${API_URL}/getallusers`, httpOptions);
-  }
-
-  getAllRoles(): Observable<any> {
-    return this.http.get(`${API_URL}/getallroles`, httpOptions);
-  }
-
   /*update(id, data): Observable<any> {
     return this.http.put(`${baseUrl}/${id}`, data);
   }*/

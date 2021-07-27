@@ -3,6 +3,9 @@ import { Observable } from 'rxjs';
 import { RoleService } from 'src/_services/role.service';
 import { UserService } from 'src/_services/user.service';
 import { ConfirmationService } from 'primeng/api';
+import { UpdateComponent } from '../update/update.component';
+import { DialogService } from 'primeng/dynamicdialog';
+import { TokenStorageService } from 'src/_services/token-storage.service';
 
 @Component({
   selector: 'app-liste-utilisateur',
@@ -14,17 +17,37 @@ export class ListeUtilisateurComponent implements OnInit {
   loading: boolean = true;
   activityValues: number[] = [0, 100];
   roles: Observable<any>;
+  organizations: Observable<any>;
+  org: any;
+
+  orgid: any;
 
   constructor(
     private userservice: UserService,
     private roleservice: RoleService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    public dialogService: DialogService,
+    private tokenStorageService: TokenStorageService
   ) {}
 
   ngOnInit(): void {
-    this.getAllUsers();
-    this.getOrganizationRoles(1);
+    //this.getAllUsers();
+    const user = this.tokenStorageService.getUser();
+    this.organizations = user.organizations;
+    this.GetOrganizationByName(user.organizations[0]);
+
+    //this.getOrganizationRoles(this.orgid);
+
     this.loading = false;
+  }
+
+  show(user) {
+    const ref = this.dialogService.open(UpdateComponent, {
+      data: {
+        user: user,
+      },
+      width: '50%',
+    });
   }
 
   getAllUsers() {
@@ -41,6 +64,21 @@ export class ListeUtilisateurComponent implements OnInit {
   getOrganizationRoles(id: number) {
     this.roleservice.getOrganizationRoles(id).subscribe((data) => {
       this.roles = data;
+    });
+  }
+
+  getOrganizationUsers(id: number) {
+    this.userservice.getOrganizationUsers(id).subscribe((data) => {
+      this.users = data;
+    });
+  }
+
+  GetOrganizationByName(str: string) {
+    this.userservice.GetOrganizationByName(str).subscribe((data) => {
+      this.org = data;
+      this.orgid = this.org.id;
+      this.getOrganizationUsers(this.orgid);
+      this.getOrganizationRoles(this.orgid);
     });
   }
 

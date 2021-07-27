@@ -5,6 +5,8 @@ import { FormGroup, Validators } from '@angular/forms';
 import { FormControl } from '@angular/forms';
 import { Identifiers } from '@angular/compiler';
 import { Role } from 'src/_models/Role';
+import { TokenStorageService } from 'src/_services/token-storage.service';
+import { RoleService } from 'src/_services/role.service';
 
 @Component({
   selector: 'app-ajouter-utilisateur',
@@ -13,6 +15,9 @@ import { Role } from 'src/_models/Role';
 })
 export class AjouterUtilisateurComponent implements OnInit {
   roles: Role[];
+  org: any;
+
+  orgid: any;
   //selectedroles: Role[];
 
   form = new FormGroup({
@@ -22,17 +27,29 @@ export class AjouterUtilisateurComponent implements OnInit {
     selectedroles: new FormControl(),
   });
 
-  constructor(private userservice: UserService) {}
+  constructor(
+    private userservice: UserService,
+    private roleservice: RoleService,
+    private tokenStorageService: TokenStorageService
+  ) {}
 
   ngOnInit(): void {
-    this.getAllRoles();
-
-    console.log(this.roles);
+    const user = this.tokenStorageService.getUser();
+    this.GetOrganizationByName(user.organizations[0]);
+    //this.getAllRoles();
+    //this.getOrganizationRoles(this.orgid);
   }
 
   getAllRoles() {
     this.userservice.getAllRoles().subscribe((data) => {
       this.roles = data;
+    });
+  }
+
+  getOrganizationRoles(id: number) {
+    this.roleservice.getOrganizationRoles(id).subscribe((data) => {
+      this.roles = data;
+      console.log(this.roles);
     });
   }
 
@@ -60,9 +77,21 @@ export class AjouterUtilisateurComponent implements OnInit {
         this.form.value.username,
         this.form.value.email,
         this.form.value.password,
-        this.form.value.selectedroles
+        this.form.value.selectedroles,
+        this.orgid
       )
       .subscribe((data) => {});
+    console.log(this.orgid);
+  }
+
+  GetOrganizationByName(str: string) {
+    this.userservice.GetOrganizationByName(str).subscribe((data) => {
+      this.org = data;
+      this.orgid = this.org.id;
+      this.getOrganizationRoles(this.orgid);
+      console.log(this.roles);
+      console.log(this.orgid);
+    });
   }
 
   onSubmit() {

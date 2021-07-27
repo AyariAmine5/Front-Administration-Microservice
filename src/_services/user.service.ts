@@ -22,10 +22,11 @@ export class UserService {
     username: string,
     email: string,
     password: string,
-    roles: Array<Role>
+    roles: Array<Role>,
+    organization_id
   ): Observable<any> {
     return this.http.post(
-      `${API_URL}/CreateUser2`,
+      `${API_URL}/CreateUser2/${organization_id}`,
       {
         username,
         email,
@@ -44,8 +45,38 @@ export class UserService {
     return this.http.get(`${API_URL}/getallusers`, httpOptions);
   }
 
+  getOrganizationUsers(id: number): Observable<any> {
+    return this.http.get(`${API_URL}/getorganizationusers/${id}`, httpOptions);
+  }
+
+  GetOrganizationByName(str: string): Observable<any> {
+    return this.http.get(
+      `${API_URL}/GetOrganizationIdByName/${str}`,
+      httpOptions
+    );
+  }
+
   getAllRoles(): Observable<any> {
     return this.http.get(`${API_URL}/getallroles`, httpOptions);
+  }
+
+  updateUser(id: number, username: string, email: string): Observable<Object> {
+    return this.http.post(
+      `http://localhost:8091/api/auth/UpdateUser/${id}`,
+      {
+        id: id,
+        username: username,
+        email: email,
+      },
+      httpOptions
+    );
+  }
+
+  getUser(id: number): Observable<any> {
+    return this.http.get(
+      `http://localhost:8091/api/auth/GetUserById/${id}`,
+      httpOptions
+    );
   }
 
   /*update(id, data): Observable<any> {

@@ -2,10 +2,8 @@
 <div class="content-header">
   <div class="container-fluid">
     <div class="row mb-2">
-      <div class="col-sm-8" *ngIf="org">
-        <h1 class="m-0 text-dark">
-          Gestion des utilisateurs de l'organisation {{ org.name }}
-        </h1>
+      <div class="col-sm-6">
+        <h1 class="m-0 text-dark">Journalisation</h1>
         <p-confirmDialog
           header="Confirmation"
           icon="pi pi-exclamation-triangle"
@@ -24,7 +22,7 @@
   <div class="card">
     <p-table
       #dt2
-      [value]="users"
+      [value]="logs"
       dataKey="id"
       [rows]="10"
       [showCurrentPageReport]="true"
@@ -33,7 +31,7 @@
       styleClass="p-datatable-customers"
       [paginator]="true"
       currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-      [globalFilterFields]="['username', 'email']"
+      [globalFilterFields]="['type', 'date']"
     >
       <ng-template pTemplate="caption">
         <div class="p-d-flex">
@@ -50,18 +48,22 @@
       </ng-template>
       <ng-template pTemplate="header">
         <tr>
-          <th>Nom d'utilisateur</th>
-          <th>E-mail</th>
-          <th>Rôle(s)</th>
-          <th></th>
+          <th>Type</th>
+          <th>Date</th>
+          <th>Adresse IP</th>
+          <th>Description</th>
+          <th>Statut</th>
           <th></th>
         </tr>
         <tr>
           <th>
-            <p-columnFilter type="text" field="username"></p-columnFilter>
+            <p-columnFilter type="text" field="type"></p-columnFilter>
           </th>
           <th>
-            <p-columnFilter type="text" field="email"></p-columnFilter>
+            <p-columnFilter type="date" field="date"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="ip"></p-columnFilter>
           </th>
           <th>
             <p-columnFilter
@@ -74,19 +76,6 @@
                 let-value
                 let-filter="filterCallback"
               >
-                <p-multiSelect
-                  [ngModel]="value"
-                  [options]="roles"
-                  placeholder="Rôle"
-                  (onChange)="filter($event.value)"
-                  optionLabel="name"
-                >
-                  <ng-template let-option pTemplate="item">
-                    <div class="p-multiselect-representative-option">
-                      <span class="p-ml-1">{{ option.name }}</span>
-                    </div>
-                  </ng-template>
-                </p-multiSelect>
               </ng-template>
             </p-columnFilter>
           </th>
@@ -118,49 +107,41 @@
             </p-columnFilter>
           </th>
           <th></th>
+          <th></th>
         </tr>
       </ng-template>
-      <ng-template pTemplate="body" let-customer>
+      <ng-template pTemplate="body" let-entry>
         <tr>
           <td>
-            {{ customer.username }}
+            {{ entry.type }}
           </td>
           <td>
-            {{ customer.email }}
+            {{ entry.date | date: "medium" }}
           </td>
           <td>
-            <p-accordion>
-              <p-accordionTab header="Afficher le(s) Rôle(s)">
-                <div *ngFor="let r of customer.roles">
-                  {{ r.name }}
-                </div>
-              </p-accordionTab>
-            </p-accordion>
+            {{ entry.ip }}
           </td>
-
-          <td style="text-align: right">
+          <td>
+            {{ entry.description }}
+          </td>
+          <td>
+            {{ entry.status }}
+          </td>
+          <td>
             <button
               pButton
               type="button"
-              label="Modifier"
               class="p-button-warning p-button-raised p-button-rounded"
-              (click)="show(customer)"
-            ></button>
-          </td>
-          <td>
-            <button
-              pButton
-              type="button"
-              label="Supprimer"
-              class="p-button-danger p-button-raised p-button-rounded"
-              (click)="confirm(customer.id)"
-            ></button>
+              (click)="confirm()"
+            >
+              {{ entry.user.username }}
+            </button>
           </td>
         </tr>
       </ng-template>
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="5">Aucun utilisateur n'a été trouvé.</td>
+          <td colspan="5">Le journal est vide.</td>
         </tr>
       </ng-template>
     </p-table>

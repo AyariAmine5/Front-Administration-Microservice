@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
 import { Observable } from 'rxjs';
 import { RoleService } from 'src/_services/role.service';
+import { TokenStorageService } from 'src/_services/token-storage.service';
+import { UserService } from 'src/_services/user.service';
 
 @Component({
   selector: 'app-liste-role',
@@ -11,15 +13,33 @@ import { RoleService } from 'src/_services/role.service';
 export class ListeRoleComponent implements OnInit {
   roles: Observable<any>;
   loading: boolean = true;
+  org: any;
+
+  orgid: any;
 
   constructor(
     private roleservice: RoleService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private tokenStorageService: TokenStorageService,
+    private userservice: UserService
   ) {}
 
   ngOnInit(): void {
-    this.getOrganizationRoles(1);
+    //this.getOrganizationRoles(1);
+
+    const user = this.tokenStorageService.getUser();
+    this.GetOrganizationByName(user.organizations[0]);
+
     this.loading = false;
+  }
+
+  GetOrganizationByName(str: string) {
+    this.userservice.GetOrganizationByName(str).subscribe((data) => {
+      this.org = data;
+      this.orgid = this.org.id;
+      this.getOrganizationRoles(this.orgid);
+      console.log(this.orgid);
+    });
   }
 
   getOrganizationRoles(id: number) {
@@ -39,6 +59,6 @@ export class ListeRoleComponent implements OnInit {
 
   deleteRole(id: number) {
     this.roleservice.deleteRole(id).subscribe((data) => {});
-    window.location.reload();
+    //window.location.reload();
   }
 }
