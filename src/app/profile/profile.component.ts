@@ -46,7 +46,6 @@ export class ProfileComponent implements OnInit {
       )
       .subscribe((data) => {});
 
-    //this.getUser();
     this.reloadPage();
   }
 
@@ -58,8 +57,11 @@ export class ProfileComponent implements OnInit {
     window.location.reload();
   }
 
-  logout(): void {
-    this.tokenStorageService.signOut();
-    this.router.navigate(['/login']);
+  UserLeaveOrganization(name) {
+    console.log(name);
+    console.log(this.currentUser.id);
+    this.userService
+      .UserLeaveOrganization(this.currentUser.id, name)
+      .subscribe();
   }
 }

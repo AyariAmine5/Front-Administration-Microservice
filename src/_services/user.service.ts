@@ -56,6 +56,10 @@ export class UserService {
     );
   }
 
+  UserLeaveOrganization(id: number, str: string): Observable<any> {
+    return this.http.post(`${API_URL}/LeaveOrg/${id}/${str}`, httpOptions);
+  }
+
   getAllRoles(): Observable<any> {
     return this.http.get(`${API_URL}/getallroles`, httpOptions);
   }
